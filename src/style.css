@@ -10,10 +10,10 @@
 
 .spm-highlight-out {
   left: 100%;
-  transition: all 0.5s ease-in-out;
+  transition: all 0.25s ease-in-out;
 }
 
 .spm-highlight-in {
   left: 0%;
-  transition: all 0.5s ease-in-out;
+  transition: all 0.25s ease-in-out;
 }

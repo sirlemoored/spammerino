@@ -33,6 +33,11 @@
         <div class="spm-highlight spm-highlight-out" id="spm-highlight">
             <button id="spm-btn-close">ZAMYKAMY SPAM.</button>
             <p id="spm-highlight-txt" contenteditable="true"></p>
+            <div id="spm-highlight-tag-box">
+                <ul id="spm-highlight-tag-list" style="display: inline;">
+                    <input type="text" id="spm-highlight-tag-input">
+                </ul>
+            </div>
         </div>
     </div>
     
@@ -41,7 +46,9 @@
     <template id="spm-list-template">
         <li class="spm-list-item">
             <button class="spm-list-edit-btn">Edit</button>
+            <button class="spm-list-remove-btn">Remove</button>
             <p class="spm-list-txt"></p>
+            <div class="spm-list-tags"></div>
         </li>
     </template>
 
