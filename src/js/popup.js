@@ -1,6 +1,6 @@
 
 /* UI handling */
-function updateList(dataset, lastSelected, ui) {
+function updateList(dataset, util, ui) {
     const list      = ui["list"];
     const template  = ui["template"];
 
@@ -10,12 +10,13 @@ function updateList(dataset, lastSelected, ui) {
     dataset.data.forEach(element => {
         let cloned = template.cloneNode(true).querySelector(".spm-list-item");
         list.appendChild(cloned);       
+
         
         cloned.querySelector(".spm-list-txt").innerHTML = element.text;
         cloned.querySelector(".spm-list-edit-btn").addEventListener("click", () => {
             var index = Array.prototype.indexOf.call(list.childNodes, cloned);
-            lastSelected["val"] = index;
-            updateHighlight(dataset, lastSelected, ui);
+            util["selected"] = index;
+            updateHighlight(dataset, util, ui);
             toggleHighlight(ui);
         });
     });
@@ -26,11 +27,11 @@ function toggleHighlight(ui) {
     ui["highlight"].classList.toggle("spm-highlight-in");
 }
 
-function updateHighlight(dataset, lastSelected, ui) {
-    ui["highlight_text"].innerHTML = dataset.data[lastSelected["val"]].text;
+function updateHighlight(dataset, util, ui) {
+    ui["highlight_text"].innerHTML = dataset.data[util["selected"]].text;
 }
 
-function getInterfaceElements(){
+function getInterfaceElements() {
     let interface = {};
     interface["list"] = document.querySelector("#spm-list");
     interface["template"] = document.querySelector("#spm-list-template").content;
@@ -38,52 +39,56 @@ function getInterfaceElements(){
     interface["highlight_text"] = document.querySelector("#spm-highlight-txt");
     interface["button_add"] = document.querySelector("#spm-btn-add");
     interface["button_close"] = document.querySelector("#spm-btn-close");
+    interface["button_remove"] = document.querySelector("#spm-btn-remove");
     return interface;
+}
+
+function getUtilData() {
+    let data = {};
+    data["selected"] = -1;
+    return data; 
+}
+
+function setEventListeners(dataset, util, ui) {
+    updateList(dataset, util, ui);
+    ui["button_add"].addEventListener("click", () => {
+        insertCopypasta(new Copypasta("(empty)", [], ""), dataset).then((_) => {
+            loadDataset(dataset);
+            updateList(dataset, util, ui);
+        });
+    });
+
+    ui["button_remove"].addEventListener("click", () => {
+        removeCopypastaAt(2, dataset).then((_) => {
+            loadDataset(dataset);
+            updateList(dataset, util, ui);
+        });
+    });
+
+
+    ui["button_close"].addEventListener("click", () => {
+        ui["highlight"].classList.toggle("spm-highlight-out");
+        ui["highlight"].classList.toggle("spm-highlight-in");
+    });
+
+
+    ui["highlight_text"].addEventListener("focusout", () => {
+        let copypasta = new Copypasta("", [], "");
+        copypasta.text = ui["highlight_text"].innerHTML;
+        setCopypastaAt(util["selected"], copypasta, dataset).then((_) => {
+            loadDataset(dataset);
+            updateList(dataset, util, ui);
+        });
+    });
 }
 
 async function main() {
 
-    let mainDataset = await loadDataset();
-    let lastSelected = { "val": -1 };
+    const dataset     = await loadDataset();
+    const util        = getUtilData();
     const ui = getInterfaceElements();
 
-    updateList(mainDataset, lastSelected, ui);
-
-    const btnElement = document.querySelector("#spm-btn-add");
-    const btnElementR = document.querySelector("#spm-btn-remove");
-    const btnElementC = document.querySelector("#spm-btn-close");
-    const highlight = document.querySelector("#spm-highlight");
-
-    btnElement.addEventListener("click", () => {
-        insertCopypasta(new Copypasta("(new copypasta)", [], ""), mainDataset).then((_) => {
-            loadDataset(mainDataset);
-            updateList(mainDataset, lastSelected, ui);
-        });
-    });
-
-    btnElementR.addEventListener("click", () => {
-        removeCopypastaAt(2, mainDataset).then((_) => {
-            loadDataset(mainDataset);
-            updateList(mainDataset, lastSelected, ui);
-        });
-    });
-
-    btnElementC.addEventListener("click", () => {
-        highlight.classList.toggle("spm-highlight-out");
-        highlight.classList.toggle("spm-highlight-in");
-    });
-
-
-    let txt = highlight.querySelector("#spm-highlight-txt");
-    txt.addEventListener("focusout", () => {
-        console.log(lastSelected);
-        let copypasta = new Copypasta("", [], "");
-        copypasta.text = txt.innerHTML;
-        setCopypastaAt(lastSelected["val"], copypasta, mainDataset).then((_) => {
-            loadDataset(mainDataset);
-            updateList(mainDataset, lastSelected, ui);
-        });
-    });
+    setEventListeners(dataset, util, ui);
 
 
 };
