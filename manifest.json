@@ -1,0 +1,19 @@
+{
+    "manifest_version": 3,
+    "name": "Spammerino",
+    "version": "0.0.1",
+    "description": "Copypasta storage",
+    "action": {
+        "default_popup": "src/popup.html",
+        "default_title": "Terefere"
+    },
+    "permissions": [
+        "tabs",
+        "storage"
+    ],
+    "icons": {
+        "16": "res/icons/x1.png",
+        "32": "res/icons/x2.png",
+        "64": "res/icons/x4.png"
+    }
+}

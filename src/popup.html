@@ -1,0 +1,54 @@
+<!-- popup.html -->
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title></title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="style.css" rel="stylesheet">
+</head>
+
+<body>
+    <div style="width: 30em;">
+        <!-- Top container (navbar sort of) -->
+        <div style="height:5em">
+            <button id="spm-btn-add">SPAM!!!</button>
+            <button id="spm-btn-remove">STOP SPAM!!!</button>
+        </div>
+
+        <!-- Main container -->
+        <div style="max-height: 25em;">
+            
+            <!-- Main list -->
+            <ul id="spm-list"></ul>
+        
+        </div>
+ 
+        <!-- Highlight slide-out container -->
+        <div class="spm-highlight spm-highlight-out" id="spm-highlight">
+            <button id="spm-btn-close">ZAMYKAMY SPAM.</button>
+            <p id="spm-highlight-txt" contenteditable="true"></p>
+        </div>
+    </div>
+    
+    <!-- Templates -->
+    <!-- List item template! -->
+    <template id="spm-list-template">
+        <li class="spm-list-item">
+            <button class="spm-list-edit-btn">Edit</button>
+            <p class="spm-list-txt"></p>
+        </li>
+    </template>
+
+    <script src="js/storage.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/popup.js"></script>
+    <script src="bootstrap/js/bootstrap.min.js"></script>
+</body>
+
+</html>

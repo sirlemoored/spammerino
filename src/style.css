@@ -1,0 +1,19 @@
+.spm-highlight {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0%;
+  z-index: 100;
+  border: 2px solid #f08080;
+  background-color: white;
+}
+
+.spm-highlight-out {
+  left: 100%;
+  transition: all 0.5s ease-in-out;
+}
+
+.spm-highlight-in {
+  left: 0%;
+  transition: all 0.5s ease-in-out;
+}
