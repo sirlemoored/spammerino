@@ -17,3 +17,16 @@
   left: 0%;
   transition: all 0.25s ease-in-out;
 }
+
+.spm-tag {
+  list-style: none;
+  padding: 3px;
+}
+
+#spm-highlight-tag-list {
+  padding: 0;
+  border: 1px solid black;
+  display:  flex;
+  flex-wrap: wrap;
+  border-radius: 2px;
+}

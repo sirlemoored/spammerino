@@ -1,86 +1,143 @@
 
 /* UI handling */
+function addListItem(dataset, util, ui) {
+    const list = ui["list"];
+    const template = ui["template"];
+    
+    let item = template.cloneNode(true).querySelector(".spm-list-item");
+    setupListItem(item, dataset, util, ui);
+    list.appendChild(item);
+
+}
+
+function removeListItem(dataset, util, ui) {
+    removeCopypastaAt(util["index"], dataset).then(_ => {
+        let list = ui["list"];
+        list.removeChild(list.children[util["index"]]);
+    });
+}
+
+function setupListItem(item, dataset, util, ui) {
+
+    const list = ui["list"];
+    let content = dataset.data[util["index"]];
+    item.querySelector(".spm-list-txt").innerHTML = content.text;
+    item.querySelector(".spm-list-edit-btn").addEventListener("click", () => {
+        var index = Array.prototype.indexOf.call(list.childNodes, item);
+        util["index"] = index;
+        updateHighlight(dataset, util, ui);
+        toggleHighlight(ui);
+    });
+
+    item.querySelector(".spm-list-remove-btn").addEventListener("click", () => {
+        var index = Array.prototype.indexOf.call(list.childNodes, item);
+        util["index"] = index;
+        removeListItem(dataset, util, ui);
+    });
+
+    let tagBox = item.querySelector(".spm-list-tags");
+    content.tags.forEach(tag => {
+        let tagNode = document.createElement("span");
+        tagNode.innerText = tag;
+        tagBox.appendChild(tagNode);
+    });    
+}
+
 function reloadList(dataset, util, ui) {
     const list      = ui["list"];
-    const template  = ui["template"];
 
     while(list.firstChild)
         list.removeChild(list.firstChild);
-
-    dataset.data.forEach(element => {
-        let cloned = template.cloneNode(true).querySelector(".spm-list-item");
-        list.appendChild(cloned);       
-
-        cloned.querySelector(".spm-list-txt").innerHTML = element.text;
-        cloned.querySelector(".spm-list-edit-btn").addEventListener("click", () => {
-            var index = Array.prototype.indexOf.call(list.childNodes, cloned);
-            util["selected"] = index;
-            updateHighlight(dataset, util, ui);
-            toggleHighlight(ui);
-        });
-
-        cloned.querySelector(".spm-list-remove-btn").addEventListener("click", () => {
-            var index = Array.prototype.indexOf.call(list.childNodes, cloned);
-            removeCopypastaAt(index, dataset).then((_) => {
-            loadDataset(dataset);
-            reloadList(dataset, util, ui);
-            });
-        });
-
-        let tagBox = cloned.querySelector(".spm-list-tags");
-        element.tags.forEach(tag => {
-            let tagNode = document.createElement("span");
-            tagNode.innerText = tag;
-            tagBox.appendChild(tagNode);
-        });
-        
+    
+    let counter = 0;
+    dataset.data.forEach(_ => {
+        util["index"] = counter;
+        addListItem(dataset, util, ui);
+        counter++;
     });
+
+}
+
+function addTag(tag, util, ui) {
+    let tagList = ui["highlight_tag_list"];
+    let item = ui["tag_template"].cloneNode(true).querySelector(".spm-tag");
+    setupTag(item, tag, util, ui);
+    if (tagList.children.length > 0) {
+        let lastChild = tagList.children[tagList.children.length - 1];
+        tagList.insertBefore(item, lastChild);
+    }
+    else {
+        tagList.appendChild(item);
+    }
+}
+
+function setupTag(item, tag, util, ui) {
+    let tagList = ui["highlight_tag_list"];
+    let temporary = util["temporary_tags"];
+    temporary.push(tag.toLowerCase());
+    item.querySelector(".spm-tag-txt").innerText = tag;
+    item.querySelector(".spm-tag-remove").addEventListener("click", () => {
+        let i = Array.prototype.indexOf.call(tagList.children, item);
+        removeTag(i, util, ui);
+    });
+}
+
+function removeTag(index, util, ui) {
+    let tagList = ui["highlight_tag_list"];
+    let temporary = util["temporary_tags"];
+
+    tagList.removeChild(tagList.children[index]);
+    temporary.splice(index, 1);
 }
 
 function toggleHighlight(ui) {
     ui["highlight"].classList.toggle("spm-highlight-out");
     ui["highlight"].classList.toggle("spm-highlight-in");
+    ui["highlight_tag_input"].value = "";
 }
 
 function updateHighlight(dataset, util, ui) {
-    let index = util["selected"];
+    let index = util["index"];
     ui["highlight_text"].innerHTML = dataset.data[index].text;
+    util["temporary_tags"] = [];
     
     let tagList = ui["highlight_tag_list"];
     let tagListChildren = ui["highlight_tag_list"].children;
     while(tagListChildren.length > 1) {
-        console.log(tagListChildren);
         tagList.removeChild(tagList.firstChild);
     }
 
-    dataset.data[index].tags.slice().reverse().forEach((tag) => {
-        let newTag = document.createElement("span");
-        newTag.innerHTML = tag;
-        tagList.insertBefore(newTag, tagList.firstChild);
+    dataset.data[index].tags.slice().forEach((tag) => {
+        addTag(tag, util, ui);
     });
 }
 
 function getInterfaceElements() {
     let interface = {};
-    interface["list"] = document.querySelector("#spm-list");
-    interface["template"] = document.querySelector("#spm-list-template").content;
-    interface["highlight"] = document.querySelector("#spm-highlight");
-    interface["highlight_text"] = document.querySelector("#spm-highlight-txt");
-    interface["highlight_tag_list"] = document.querySelector("#spm-highlight-tag-list");
+    interface["list"]                = document.querySelector("#spm-list");
+    interface["template"]            = document.querySelector("#spm-list-template").content;
+    interface["tag_template"]        = document.querySelector("#spm-tag-template").content;
+    interface["highlight"]           = document.querySelector("#spm-highlight");
+    interface["highlight_text"]      = document.querySelector("#spm-highlight-txt");
+    interface["highlight_tag_list"]  = document.querySelector("#spm-highlight-tag-list");
     interface["highlight_tag_input"] = document.querySelector("#spm-highlight-tag-input");
-    interface["button_add"] = document.querySelector("#spm-btn-add");
-    interface["button_close"] = document.querySelector("#spm-btn-close");
+    interface["highlight_save"]      = document.querySelector("#spm-btn-save");
+    interface["button_add"]          = document.querySelector("#spm-btn-add");
+    interface["button_close"]        = document.querySelector("#spm-btn-close");
+    interface["tag_filter_input"]    = document.querySelector("#spm-tag-filter");
+    interface["button_tag_clear"]    = document.querySelector("#spm-tag-clear");
     return interface;
 }
 
 function getUtilData() {
     let data = {};
-    data["selected"] = -1;
+    data["index"] = -1;
+    data["temporary_tags"] = [];
+    data["tag"] = "";
     return data; 
 }
 
 function setEventListeners(dataset, util, ui) {
-    reloadList(dataset, util, ui);
     ui["button_add"].addEventListener("click", () => {
         insertCopypasta(new Copypasta("(empty)", [], ""), dataset).then((_) => {
             loadDataset(dataset);
@@ -89,18 +146,67 @@ function setEventListeners(dataset, util, ui) {
     });
 
     ui["button_close"].addEventListener("click", () => {
-        ui["highlight"].classList.toggle("spm-highlight-out");
-        ui["highlight"].classList.toggle("spm-highlight-in");
+        toggleHighlight(ui);
     });
 
 
-    ui["highlight_text"].addEventListener("focusout", () => {
+    ui["highlight_save"].addEventListener("click", () => {
         let copypasta = new Copypasta("", [], "");
         copypasta.text = ui["highlight_text"].innerHTML;
-        setCopypastaAt(util["selected"], copypasta, dataset).then((_) => {
+        copypasta.tags = util["temporary_tags"];
+        setCopypastaAt(util["index"], copypasta, dataset).then((_) => {
             loadDataset(dataset);
             reloadList(dataset, util, ui);
+            toggleHighlight(ui);
         });
+    });
+
+    ui["tag_filter_input"].addEventListener("input", key => {
+        let tags = key.target.value.split(/[\s,;]+/).filter(t => {
+            return t !== "";
+        });
+        let filteredData = [...dataset.data];
+        if (tags.length > 0) {
+            dataset.data.forEach(element => {
+                let containsAllTags = true;
+                for (let i = 0; i < tags.length && containsAllTags; i++) {
+                    let tagMatching = false;
+                    for (let j = 0; j < element.tags.length && !tagMatching; j++) {
+                        if (element.tags[j].includes(tags[i]))
+                            tagMatching = true;
+                    }
+                    if (!tagMatching)
+                        containsAllTags = false;
+                }
+                if (!containsAllTags) {
+                    let index = filteredData.indexOf(element);
+                    if (index > -1)
+                        filteredData.splice(index, 1);
+                }
+            });
+        }
+        reloadList(new Dataset(filteredData), util, ui);
+    });
+
+    ui["highlight_tag_input"].addEventListener("keyup", key => {
+        switch(key.key){
+            case ",":
+                let v = ui["highlight_tag_input"].value.replaceAll(",","").toLowerCase();
+                ui["highlight_tag_input"].value = "";
+                if (v != "")
+                    addTag(v, util, ui);
+                break;
+            case "Backspace":
+                if(ui["highlight_tag_input"].value == "") {
+                    let i = util["temporary_tags"].length;
+                    if (i > 0) {
+                        ui["highlight_tag_input"].value = util["temporary_tags"][i - 1];
+                        removeTag(i - 1, util, ui);
+                    }
+                }
+                break;
+            default:
+        }
     });
 }
 
@@ -108,10 +214,10 @@ async function main() {
 
     const dataset     = await loadDataset();
     const util        = getUtilData();
-    const ui = getInterfaceElements();
+    const ui          = getInterfaceElements();
 
+    reloadList(dataset, util, ui);
     setEventListeners(dataset, util, ui);
-
 
 };
 
