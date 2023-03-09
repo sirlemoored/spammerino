@@ -9,25 +9,37 @@
     <title></title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500&display=swap" rel="stylesheet">
+    
     <link href="style.css" rel="stylesheet">
 </head>
 
 <body>
-    <div style="width: 30em;">
+    <div style="width: 25em;">
         <!-- Top container (navbar sort of) -->
-        <div style="height:5em">
-            <button id="spm-btn-add">Add</button>
-            <input type="text" placeholder="Filter tags" id="spm-tag-filter">
-            <button id="spm-tag-clear">Clear tags</button>
+        <div id="spm-navbar">
+            <div class="filter-box">
+                <input type="text" placeholder="Filter tags" id="spm-tag-filter">
+                <button id="spm-tag-clear" class="btn-invisible">
+                    <i class="material-icons">clear</i>
+                </button>
+            </div>
+            <div style="flex-grow: 1"></div>
+            <button id="spm-btn-add">
+                <span>Add pasta</span>
+            </button>
         </div>
 
         <!-- Main container -->
-        <div style="max-height: 25em;">
-            
-            <!-- Main list -->
-            <ul id="spm-list"></ul>
-        
+        <div style="height: 25em;">
+            <div style="max-height: 100px;">
+                <!-- Main list -->
+                <ul id="spm-list"></ul>
+            </div>
         </div>
  
         <!-- Highlight slide-out container -->
@@ -46,11 +58,13 @@
     <!-- Templates -->
     <!-- List item template! -->
     <template id="spm-list-template">
-        <li class="spm-list-item">
-            <button class="spm-list-edit-btn">Edit</button>
-            <button class="spm-list-remove-btn">Remove</button>
-            <p class="spm-list-txt"></p>
-            <div class="spm-list-tags"></div>
+        <li class="spm-list-item grid-horizontal">
+            <div class="spm-list-txt"></div>
+            <div class="spm-list-info">
+                <div class="spm-list-tags"></div>
+                <button class="spm-list-edit-btn btn-small">Edit</button>
+                <button class="spm-list-remove-btn btn-small">Remove</button>
+            </div>
         </li>
     </template>
 
@@ -60,7 +74,6 @@
             <button class="spm-tag-remove">(X)</button>
         </li>
     </template>
-
     <script src="js/storage.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/popup.js"></script>
