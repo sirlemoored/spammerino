@@ -21,7 +21,7 @@ function setupListItem(item, dataset, util, ui) {
 
     const list = ui["list"];
     let content = dataset.data[util["index"]];
-    item.querySelector(".spm-list-txt").innerHTML = content.text;
+    item.querySelector(".spm-list-txt").innerText = content.text;
     item.querySelector(".spm-list-edit-btn").addEventListener("click", () => {
         var index = Array.prototype.indexOf.call(list.childNodes, item);
         util["index"] = index;
@@ -32,15 +32,27 @@ function setupListItem(item, dataset, util, ui) {
     item.querySelector(".spm-list-remove-btn").addEventListener("click", () => {
         var index = Array.prototype.indexOf.call(list.childNodes, item);
         util["index"] = index;
-        removeListItem(dataset, util, ui);
+
+        if (util["deletable_item"] == index) {
+            removeListItem(dataset, util, ui);
+            util["deletable_item"] = -1;
+            item.querySelector(".spm-list-remove-btn").classList.remove("btn-remove");
+            item.querySelector(".spm-list-remove-btn").classList.add("btn-normal");
+        }
+
+        else {
+            util["deletable_item"] = index;
+            item.querySelector(".spm-list-remove-btn").classList.add("btn-remove");
+            item.querySelector(".spm-list-remove-btn").classList.remove("btn-normal");
+        }
+
     });
 
-    let tagBox = item.querySelector(".spm-list-tags");
-    content.tags.forEach(tag => {
-        let tagNode = document.createElement("span");
-        tagNode.innerText = tag;
-        tagBox.appendChild(tagNode);
-    });    
+    item.querySelector(".spm-list-remove-btn").addEventListener("focusout", () => {
+        util["deletable_item"] = -1;
+        item.querySelector(".spm-list-remove-btn").classList.remove("btn-remove");
+        item.querySelector(".spm-list-remove-btn").classList.add("btn-normal");
+    });
 }
 
 function reloadList(dataset, util, ui) {
@@ -98,7 +110,7 @@ function toggleHighlight(ui) {
 
 function updateHighlight(dataset, util, ui) {
     let index = util["index"];
-    ui["highlight_text"].innerHTML = dataset.data[index].text;
+    ui["highlight_text"].value = dataset.data[index].text;
     util["temporary_tags"] = [];
     
     let tagList = ui["highlight_tag_list"];
@@ -134,12 +146,13 @@ function getUtilData() {
     data["index"] = -1;
     data["temporary_tags"] = [];
     data["tag"] = "";
+    data["deletable_item"] = -1;
     return data; 
 }
 
 function setEventListeners(dataset, util, ui) {
     ui["button_add"].addEventListener("click", () => {
-        insertCopypasta(new Copypasta("(empty)", [], ""), dataset).then((_) => {
+        unshiftCopypasta(new Copypasta("(empty)", [], ""), dataset).then((_) => {
             loadDataset(dataset);
             reloadList(dataset, util, ui);
         });
@@ -152,7 +165,7 @@ function setEventListeners(dataset, util, ui) {
 
     ui["highlight_save"].addEventListener("click", () => {
         let copypasta = new Copypasta("", [], "");
-        copypasta.text = ui["highlight_text"].innerHTML;
+        copypasta.text = ui["highlight_text"].value;
         copypasta.tags = util["temporary_tags"];
         setCopypastaAt(util["index"], copypasta, dataset).then((_) => {
             loadDataset(dataset);
@@ -207,6 +220,13 @@ function setEventListeners(dataset, util, ui) {
                 break;
             default:
         }
+    });
+
+    ui["highlight_tag_input"].addEventListener("focusout", () => {
+        let v = ui["highlight_tag_input"].value.replaceAll(",","").toLowerCase();
+        ui["highlight_tag_input"].value = "";
+        if (v != "")
+            addTag(v, util, ui);
     });
 }
 

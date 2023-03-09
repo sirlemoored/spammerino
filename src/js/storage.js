@@ -35,6 +35,11 @@ async function insertCopypasta(copypasta, dataset) {
     return setData(DATA_KEY, dataset);
 }
 
+async function unshiftCopypasta(copypasta, dataset) {
+    dataset.addCopypastaBegin(copypasta);
+    return setData(DATA_KEY, dataset);
+}
+
 async function setCopypastaAt(index, copypasta, dataset) {
     dataset.setCopypastaAt(index, copypasta);
     return setData(DATA_KEY, dataset);

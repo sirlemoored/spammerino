@@ -28,6 +28,11 @@ class Dataset {
             this.data.push(pasta);
     }
 
+    addCopypastaBegin(pasta) {
+        if (pasta != null)
+            this.data.unshift(pasta);
+    }
+
     removeCopypastaAt(index) {
         if (this.data.length > index)
             this.data.splice(index, 1);

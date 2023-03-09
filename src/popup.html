@@ -19,7 +19,7 @@
 </head>
 
 <body>
-    <div style="width: 25em;">
+    <div style="width: 23em;">
         <!-- Top container (navbar sort of) -->
         <div id="spm-navbar">
             <div class="filter-box">
@@ -36,7 +36,7 @@
 
         <!-- Main container -->
         <div style="height: 25em;">
-            <div style="max-height: 100px;">
+            <div>
                 <!-- Main list -->
                 <ul id="spm-list"></ul>
             </div>
@@ -44,13 +44,19 @@
  
         <!-- Highlight slide-out container -->
         <div class="spm-highlight spm-highlight-out" id="spm-highlight">
-            <button id="spm-btn-save">Save</button>
-            <button id="spm-btn-close">Close</button>
-            <p id="spm-highlight-txt" contenteditable="true"></p>
-            <div id="spm-highlight-tag-box">
-                <ul id="spm-highlight-tag-list" >
-                    <input type="text" id="spm-highlight-tag-input">
-                </ul>
+            <div style="margin: 10px; position: relative;">
+                <button id="spm-btn-save">Save</button>
+                <button id="spm-btn-close" class="btn-invisible">
+                    <i class="material-icons">clear</i>
+                </button>
+            </div>
+            <div style="margin: 10px;">
+                <textarea id="spm-highlight-txt" placeholder="Type your copypasta here" ></textarea>
+                <div id="spm-highlight-tag-box">
+                    <ul id="spm-highlight-tag-list" >
+                        <input type="text" id="spm-highlight-tag-input">
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
@@ -61,9 +67,12 @@
         <li class="spm-list-item grid-horizontal">
             <div class="spm-list-txt"></div>
             <div class="spm-list-info">
-                <div class="spm-list-tags"></div>
-                <button class="spm-list-edit-btn btn-small">Edit</button>
-                <button class="spm-list-remove-btn btn-small">Remove</button>
+                <button class="spm-list-edit-btn btn-normal">
+                    <i class="material-icons">edit</i>
+                </button>
+                <button class="spm-list-remove-btn btn-normal">
+                    <i class="material-icons">clear</i>
+                </button>
             </div>
         </li>
     </template>

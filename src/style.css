@@ -3,13 +3,16 @@ body, button {
   font-size: 12pt;
 }
 
+input, textarea {
+  font-family: 'Montserrat', sans-serif;
+}
+
 .spm-highlight {
   position: fixed;
   width: 100%;
   height: 100%;
   top: 0%;
   z-index: 100;
-  border: 2px solid #f08080;
   background-color: white;
 }
 
@@ -76,7 +79,6 @@ body, button {
 
 .filter-box > input {
   background-color: transparent;
-  font-family: 'Montserrat', sans-serif;
 }
 
 
@@ -97,18 +99,29 @@ body, button {
   align-items: center;
 }
 
-#spm-btn-add {
+#spm-btn-add, #spm-btn-save {
   flex-grow: 1;
   height: 40px;
+  min-width: 100px;
   border-radius: 1000px;
   border: none;
   background-color:#9147ff;
   color: white;
-  box-shadow: 4px 4px 10px grey ;
+  box-shadow: 4px 4px 4px grey ;
   cursor: pointer;
 }
 
 #spm-btn-add > span {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 12pt;
+}
+
+#spm-btn-save > span {
   position: relative;
   width: 100%;
   height: 100%;
@@ -124,11 +137,6 @@ body, button {
   font-size: 12pt;
 }
 
-#spm-list{
-  max-height: 400px;
-  overflow-y: auto;
-}
-
 ::-webkit-scrollbar-thumb {
   background-color: lightgray;
   border-radius: 20px;
@@ -136,33 +144,117 @@ body, button {
 
 ::-webkit-scrollbar {
     width: 8px;
+    height: 8px;
     border-radius: 20px;
 }
 
 #spm-list {
-  padding: 0;
-  margin-left: 10px;
-  margin-right: 10px;
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 0 10px 0 10px;
 }
 
 .grid-horizontal {
   display: grid;
-  grid-template-columns: 60% 40%;
+  grid-template-columns: 90% 10%;
+}
+
+.spm-list-txt {
+  max-height: 75px;
+  word-wrap: break-word;
+  overflow: auto;
+  font-size: 9pt;
+  padding: 5px;
 }
 
 .spm-list-item {
   list-style: none;
-  min-height: 100px;
+  height: 80px;
   margin-top: 5px;
   margin-bottom: 5px;
+  padding: 5px;
+  transition: ease-in-out all 0.1s;
+  border-radius: 5px;
+  box-shadow: 0px 10px 10px #eee;
+  
+}
+
+.spm-list-item:hover {
+  transform: scale(1.03);
+  transition: ease-in-out all 0.1s
+}
+
+.spm-list-item > .spm-list-txt::-webkit-scrollbar-thumb {
+  background-color: transparent;
 }
 
 .spm-list-item > .spm-list-txt{
   grid-column: 1;
-  border: 1px solid purple;
   margin-right: 5px;
+  cursor: pointer;
 }
 
 .spm-list-item > .spm-list-info {
   grid-column: 2;
+}
+
+#spm-highlight-txt {
+  height: 75px;
+  resize: none;
+}
+
+.spm-list-info {
+  position: relative;
+}
+
+.spm-list-remove-btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.spm-list-remove-btn > i {
+  font-size: 14pt;
+  vertical-align: top;
+}
+
+.spm-list-edit-btn {
+  position: absolute;
+  top: 20pt;
+  right: 0pt;
+}
+
+.spm-list-edit-btn > i {
+  font-size: 13pt;
+  vertical-align: top;
+}
+
+.btn-normal {
+  height: 18pt;
+  width: 18pt;
+  border: none;
+  background: none;
+  border-radius: 10px;
+  padding: 0;
+  cursor: pointer;
+  transition: ease-in-out all 0.1s;
+  color: grey;
+}
+
+.btn-remove {
+  background: red;
+  color: white;
+  width: 18pt;
+  height: 18pt;
+  border-radius: 10px;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  box-shadow: 0px 3px 8px salmon;
+  transition: ease-in-out all 0.1s;
+}
+
+#spm-btn-close {
+  position: absolute;
+  right: 0;
 }
