@@ -56,7 +56,7 @@ function setupListItem(item, dataset, util, ui) {
     });
 
     item.querySelector(".spm-list-txt").addEventListener("click", () => {
-        navigator.clipboard.writeText(content.text);
+        navigator.clipboard.writeText(content);
         let copiedInfo = item.querySelector(".spm-list-copied-info");
         copiedInfo.classList.remove("spm-list-copied-info-disabled");
         copiedInfo.classList.add("spm-list-copied-info-active");
@@ -169,9 +169,10 @@ function getUtilData() {
 
 function setEventListeners(dataset, util, ui) {
     ui["button_add"].addEventListener("click", () => {
-        unshiftCopypasta(new Copypasta("(empty)", [], ""), dataset).then((_) => {
+        unshiftCopypasta(new Copypasta("", [], ""), dataset).then((_) => {
             loadDataset(dataset);
             reloadList(dataset, util, ui);
+            toggleHighlight(ui);
         });
     });
 
