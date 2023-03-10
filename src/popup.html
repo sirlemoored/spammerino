@@ -19,22 +19,24 @@
 </head>
 
 <body>
-    <div style="width: 23em;">
+    <div style="width: 23em; position: relative;">
         <!-- Top container (navbar sort of) -->
         <div id="spm-navbar">
             <div class="filter-box">
-                <input type="text" placeholder="Filter tags" id="spm-tag-filter">
+                <input type="text" placeholder="Search..." id="spm-tag-filter">
                 <button id="spm-tag-clear" class="btn-invisible">
                     <i class="material-icons">clear</i>
                 </button>
             </div>
-            <div style="flex-grow: 1"></div>
+            <button id="spm-btn-settings" class="btn-invisible">
+                <i class="material-icons">settings</i>
+            </button>
             <button id="spm-btn-add">
                 <span>Add pasta</span>
             </button>
         </div>
 
-        <!-- Main container -->
+        <!-- List container -->
         <div style="height: 25em;">
             <div>
                 <!-- Main list -->
@@ -50,15 +52,23 @@
                     <i class="material-icons">clear</i>
                 </button>
             </div>
-            <div style="margin: 10px;">
+            <div style="margin: 10px; height: 60%;">
                 <textarea id="spm-highlight-txt" placeholder="Type your copypasta here" ></textarea>
-                <div id="spm-highlight-tag-box">
+                <div id="spm-highlight-tag-box" style="max-height: 35%; overflow-x: hidden">
                     <ul id="spm-highlight-tag-list" >
-                        <input type="text" id="spm-highlight-tag-input">
+                        <input type="text" placeholder="Type your tags here" id="spm-highlight-tag-input">
                     </ul>
                 </div>
             </div>
         </div>
+
+            <div id="spm-dropdown" class="spm-settings-out">
+                <div>
+                    <input type="file" id="spm-file-input" style="display: none">
+                    <button id="spm-btn-export">Export</button>
+                    <button id="spm-btn-import">Import</button>
+                </div>
+            </div>
     </div>
     
     <!-- Templates -->
@@ -73,6 +83,9 @@
                 <button class="spm-list-remove-btn btn-normal">
                     <i class="material-icons">clear</i>
                 </button>
+                <div class="spm-list-copied-info spm-list-copied-info-disabled">
+                    Copied!
+                </div>
             </div>
         </li>
     </template>
@@ -80,7 +93,9 @@
     <template id="spm-tag-template">
         <li class="spm-tag">
             <span class="spm-tag-txt"></span>
-            <button class="spm-tag-remove">(X)</button>
+            <button class="spm-tag-remove btn-remove-tag">
+                <i class="material-icons">clear</i>
+            </button>
         </li>
     </template>
     <script src="js/storage.js"></script>

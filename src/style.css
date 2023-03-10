@@ -33,10 +33,23 @@ input, textarea {
 
 #spm-highlight-tag-list {
   padding: 0;
-  border: 1px solid black;
   display:  flex;
   flex-wrap: wrap;
   border-radius: 2px;
+}
+
+#spm-highlight-tag-list:focus {
+  outline: none;
+}
+
+#spm-highlight-tag-input {
+  border: none;
+  min-width:100px;
+  flex-grow: 1;
+}
+
+#spm-highlight-tag-input:focus {
+  outline: none;
 }
 
 #spm-tag-filter {
@@ -71,7 +84,7 @@ input, textarea {
 }
 
 .filter-box {
-  background: linear-gradient(grey, grey) left bottom 1px / 80% 1px no-repeat;
+  background: linear-gradient(grey, grey) left bottom 1px / 93% 1px no-repeat;
   flex-grow: 3;
   padding-left: 0px;
   padding-right: 0px;
@@ -107,9 +120,10 @@ input, textarea {
   border: none;
   background-color:#9147ff;
   color: white;
-  box-shadow: 4px 4px 4px grey ;
+  box-shadow: 2px 2px 4px grey ;
   cursor: pointer;
 }
+
 
 #spm-btn-add > span {
   position: relative;
@@ -165,6 +179,7 @@ input, textarea {
   overflow: auto;
   font-size: 9pt;
   padding: 5px;
+  margin: 5px;
 }
 
 .spm-list-item {
@@ -190,7 +205,6 @@ input, textarea {
 
 .spm-list-item > .spm-list-txt{
   grid-column: 1;
-  margin-right: 5px;
   cursor: pointer;
 }
 
@@ -199,9 +213,19 @@ input, textarea {
 }
 
 #spm-highlight-txt {
-  height: 75px;
+  height: 100%;
+  width: 100%;
   resize: none;
+  border: none;
+  border-bottom: 1px solid #9147ff;
+  background-color: white;
 }
+
+#spm-highlight-txt:focus {
+  outline: none;
+}
+
+
 
 .spm-list-info {
   position: relative;
@@ -227,6 +251,30 @@ input, textarea {
 .spm-list-edit-btn > i {
   font-size: 13pt;
   vertical-align: top;
+}
+
+.spm-list-copied-info {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  font-weight: 100;
+  padding: 0 5px 0 5px;
+  border-radius: 10px;
+  font-size: 8pt;
+  user-select: none;
+}
+
+.spm-list-copied-info-active {
+  background: #9147ff;
+  box-shadow: 3px 3px 3px lightgray;
+  color: white;
+  transition: ease-in-out all 0.25s;
+}
+
+.spm-list-copied-info-disabled {
+  background: none;
+  color: transparent;
+  transition: ease-in-out all 0.25s;
 }
 
 .btn-normal {
@@ -257,4 +305,88 @@ input, textarea {
 #spm-btn-close {
   position: absolute;
   right: 0;
+}
+
+#spm-btn-settings {
+  flex-grow: 1; 
+  color: #9147ff; 
+  text-shadow: 2px 2px 5px gray; 
+  margin-left: 10px; 
+  margin-right: 15px;
+}
+
+
+#spm-dropdown {
+  top: 50px;
+  width: 92%;
+  left: 3%;
+  height: 50px;
+  overflow: hidden;
+  position: absolute;
+  background-color: white;
+  box-shadow: 2px 2px 5px lightgray;
+  border-radius: 20px;
+}
+
+#spm-dropdown > div {
+  height: 100%;
+  display: grid;
+  grid-template-columns: 50% 50% ;
+  justify-items: center;
+  align-items: center;;
+}
+
+.spm-settings-out {
+  opacity: 0;
+  transition: ease-in-out all 0.25s;
+  z-index: -100;
+}
+
+.spm-settings-in {
+  opacity: 1;
+  transition: ease-in-out all 0.25s;
+  z-index: 100;
+}
+
+#spm-btn-export, #spm-btn-import {
+  flex-grow: 1;
+  padding: 5px;
+  width: 100px;
+  border-radius: 1000px;
+  border: none;
+  background-color:#9147ff;
+  color: white;
+  box-shadow: 2px 2px 4px grey ;
+  cursor: pointer;
+}
+
+.spm-tag {
+  border-radius: 10px;
+  background: #9147ff;
+  color: white;
+  font-size: 12px;
+  padding: 5px;
+  margin: 5px;
+}
+
+.spm-tag-txt {
+  vertical-align: middle;
+}
+
+.spm-tag-remove > i {
+  color: white;
+  font-size: 14px;
+}
+
+.btn-remove-tag {
+  height: 12pt;
+  width: 12pt;
+  border: none;
+  background: none;
+  border-radius: 10px;
+  padding: 0;
+  cursor: pointer;
+  transition: ease-in-out all 0.1s;
+  color: white;
+  vertical-align: middle;
 }

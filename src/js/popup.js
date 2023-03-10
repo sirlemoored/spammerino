@@ -20,8 +20,9 @@ function removeListItem(dataset, util, ui) {
 function setupListItem(item, dataset, util, ui) {
 
     const list = ui["list"];
-    let content = dataset.data[util["index"]];
-    item.querySelector(".spm-list-txt").innerText = content.text;
+    let content = dataset.data[util["index"]].text;
+    let text = content == "" ? "Empty copypasta :(" : content;
+    item.querySelector(".spm-list-txt").innerText = text;
     item.querySelector(".spm-list-edit-btn").addEventListener("click", () => {
         var index = Array.prototype.indexOf.call(list.childNodes, item);
         util["index"] = index;
@@ -52,6 +53,18 @@ function setupListItem(item, dataset, util, ui) {
         util["deletable_item"] = -1;
         item.querySelector(".spm-list-remove-btn").classList.remove("btn-remove");
         item.querySelector(".spm-list-remove-btn").classList.add("btn-normal");
+    });
+
+    item.querySelector(".spm-list-txt").addEventListener("click", () => {
+        navigator.clipboard.writeText(content.text);
+        let copiedInfo = item.querySelector(".spm-list-copied-info");
+        copiedInfo.classList.remove("spm-list-copied-info-disabled");
+        copiedInfo.classList.add("spm-list-copied-info-active");
+        setTimeout(() => {
+            copiedInfo.classList.add("spm-list-copied-info-disabled");
+            copiedInfo.classList.remove("spm-list-copied-info-active");
+        }, 500);
+
     });
 }
 
@@ -138,6 +151,10 @@ function getInterfaceElements() {
     interface["button_close"]        = document.querySelector("#spm-btn-close");
     interface["tag_filter_input"]    = document.querySelector("#spm-tag-filter");
     interface["button_tag_clear"]    = document.querySelector("#spm-tag-clear");
+    interface["button_settings"]     = document.querySelector("#spm-btn-settings");
+    interface["file_input"]          = document.querySelector("#spm-file-input");
+    interface["button_import"]       = document.querySelector("#spm-btn-import");
+    interface["button_export"]       = document.querySelector("#spm-btn-export");
     return interface;
 }
 
@@ -162,10 +179,16 @@ function setEventListeners(dataset, util, ui) {
         toggleHighlight(ui);
     });
 
+    ui["button_settings"].addEventListener("click", () => {
+        let dropdown = document.querySelector("#spm-dropdown");
+        dropdown.classList.toggle("spm-settings-out");
+        dropdown.classList.toggle("spm-settings-in");
+    });
+
 
     ui["highlight_save"].addEventListener("click", () => {
         let copypasta = new Copypasta("", [], "");
-        copypasta.text = ui["highlight_text"].value;
+        copypasta.text = ui["highlight_text"].value.replaceAll("\n","");
         copypasta.tags = util["temporary_tags"];
         setCopypastaAt(util["index"], copypasta, dataset).then((_) => {
             loadDataset(dataset);
@@ -174,6 +197,7 @@ function setEventListeners(dataset, util, ui) {
         });
     });
 
+
     ui["tag_filter_input"].addEventListener("input", key => {
         let tags = key.target.value.split(/[\s,;]+/).filter(t => {
             return t !== "";
@@ -181,17 +205,7 @@ function setEventListeners(dataset, util, ui) {
         let filteredData = [...dataset.data];
         if (tags.length > 0) {
             dataset.data.forEach(element => {
-                let containsAllTags = true;
-                for (let i = 0; i < tags.length && containsAllTags; i++) {
-                    let tagMatching = false;
-                    for (let j = 0; j < element.tags.length && !tagMatching; j++) {
-                        if (element.tags[j].includes(tags[i]))
-                            tagMatching = true;
-                    }
-                    if (!tagMatching)
-                        containsAllTags = false;
-                }
-                if (!containsAllTags) {
+                if (!containsTagsAny(element, tags) && !containsTextAny(element, tags)) {
                     let index = filteredData.indexOf(element);
                     if (index > -1)
                         filteredData.splice(index, 1);
@@ -204,7 +218,7 @@ function setEventListeners(dataset, util, ui) {
     ui["highlight_tag_input"].addEventListener("keyup", key => {
         switch(key.key){
             case ",":
-                let v = ui["highlight_tag_input"].value.replaceAll(",","").toLowerCase();
+                let v = ui["highlight_tag_input"].value.replaceAll(/[,\n]/g,"").toLowerCase().substring(0,25);
                 ui["highlight_tag_input"].value = "";
                 if (v != "")
                     addTag(v, util, ui);
@@ -223,11 +237,58 @@ function setEventListeners(dataset, util, ui) {
     });
 
     ui["highlight_tag_input"].addEventListener("focusout", () => {
-        let v = ui["highlight_tag_input"].value.replaceAll(",","").toLowerCase();
+        let v = ui["highlight_tag_input"].value.replaceAll(/[,\n]/g,"").toLowerCase().substring(0, 25);
         ui["highlight_tag_input"].value = "";
         if (v != "")
             addTag(v, util, ui);
     });
+
+    ui["file_input"].addEventListener("change", event => {
+        let fs = ui["file_input"].files
+        if (fs.length > 0) {
+            let file = fs[0];
+            let reader = new FileReader();
+            reader.readAsText(file, "UTF-8");
+            reader.onload = ev => {
+                let text = ev.target.result;
+                try {
+                    let obj = JSON.parse(text);
+                    setData(DATA_KEY, obj).then(async _ => {
+                    dataset = await loadDataset();
+                    reloadList(dataset, util, ui);
+                });
+                } catch (e) {
+                    console.log("Invalid JSON!");
+                }
+            };
+        }
+    });
+
+    ui["button_import"].addEventListener("click", () => {
+        ui["file_input"].click();
+        let dropdown = document.querySelector("#spm-dropdown");
+        dropdown.classList.toggle("spm-settings-out");
+        dropdown.classList.toggle("spm-settings-in");
+    });
+
+    ui["button_export"].addEventListener("click", () => {
+        // This code yoinked from https://stackoverflow.com/questions/19721439/download-json-object-as-a-file-from-browser
+        let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataset));
+        let downloadAnchorNode = document.createElement('a');
+        downloadAnchorNode.setAttribute("href",     dataStr);
+        downloadAnchorNode.setAttribute("download", "copypasta" + ".json");
+        document.body.appendChild(downloadAnchorNode); // required for firefox
+        downloadAnchorNode.click();
+        downloadAnchorNode.remove();
+        let dropdown = document.querySelector("#spm-dropdown");
+        dropdown.classList.toggle("spm-settings-out");
+        dropdown.classList.toggle("spm-settings-in");
+    });
+
+    ui["button_tag_clear"].addEventListener("click", () => {
+        ui["tag_filter_input"].value = "";
+        reloadList(dataset, util, ui);
+    })
 }
 
 async function main() {

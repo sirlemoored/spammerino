@@ -1,11 +1,11 @@
 {
     "manifest_version": 3,
     "name": "Spammerino",
-    "version": "0.0.1",
+    "version": "1.0.0",
     "description": "Copypasta storage",
     "action": {
         "default_popup": "src/popup.html",
-        "default_title": "Terefere"
+        "default_title": "It's like a third party thing."
     },
     "permissions": [
         "tabs",
