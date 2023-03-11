@@ -11,30 +11,35 @@ function addListItem(dataset, util, ui) {
 }
 
 function removeListItem(dataset, util, ui) {
+    util["filtered_dataset"].data.splice(util["filtered_index"], 1);
     removeCopypastaAt(util["index"], dataset).then(_ => {
         let list = ui["list"];
-        list.removeChild(list.children[util["index"]]);
+        list.removeChild(list.childNodes[util["filtered_index"]]);
     });
 }
 
 function setupListItem(item, dataset, util, ui) {
 
     const list = ui["list"];
-    let content = dataset.data[util["index"]].text;
+    let copypasta = dataset.data[util["index"]];
+    let content = copypasta.text;
     let text = content == "" ? "Empty copypasta :(" : content;
     item.querySelector(".spm-list-txt").innerText = text;
+    
     item.querySelector(".spm-list-edit-btn").addEventListener("click", () => {
         var index = Array.prototype.indexOf.call(list.childNodes, item);
-        util["index"] = index;
+        util["filtered_index"] = index;
+        util["index"] = dataset.data.indexOf(util["filtered_dataset"].data[index]);
         updateHighlight(dataset, util, ui);
         toggleHighlight(ui);
     });
 
     item.querySelector(".spm-list-remove-btn").addEventListener("click", () => {
         var index = Array.prototype.indexOf.call(list.childNodes, item);
-        util["index"] = index;
 
         if (util["deletable_item"] == index) {
+            util["filtered_index"] = index;
+            util["index"] = dataset.data.indexOf(util["filtered_dataset"].data[index]);
             removeListItem(dataset, util, ui);
             util["deletable_item"] = -1;
             item.querySelector(".spm-list-remove-btn").classList.remove("btn-remove");
@@ -75,8 +80,9 @@ function reloadList(dataset, util, ui) {
         list.removeChild(list.firstChild);
     
     let counter = 0;
-    dataset.data.forEach(_ => {
-        util["index"] = counter;
+    util["filtered_dataset"].data.forEach(item => {
+        util["filtered_index"] = counter
+        util["index"] = dataset.data.indexOf(item);
         addListItem(dataset, util, ui);
         counter++;
     });
@@ -158,21 +164,34 @@ function getInterfaceElements() {
     return interface;
 }
 
-function getUtilData() {
+function getUtilData(dataset) {
     let data = {};
     data["index"] = -1;
     data["temporary_tags"] = [];
     data["tag"] = "";
     data["deletable_item"] = -1;
+    data["filtered_dataset"] = dataset;
+    data["filtered_index"] = -1;
     return data; 
 }
 
 function setEventListeners(dataset, util, ui) {
+    
+    window.onload = () => {
+        ui["tag_filter_input"].focus();   
+    };
+    
     ui["button_add"].addEventListener("click", () => {
         unshiftCopypasta(new Copypasta("", [], ""), dataset).then((_) => {
             loadDataset(dataset);
             reloadList(dataset, util, ui);
+            util["index"] = 0;
+            util["filtered_index"] = 0;
+            updateHighlight(dataset, util, ui);
             toggleHighlight(ui);
+            
+            ui["tag_filter_input"].value = "";
+            util["filtered_dataset"] = dataset;
         });
     });
 
@@ -192,6 +211,7 @@ function setEventListeners(dataset, util, ui) {
         copypasta.text = ui["highlight_text"].value.replaceAll("\n","");
         copypasta.tags = util["temporary_tags"];
         setCopypastaAt(util["index"], copypasta, dataset).then((_) => {
+            util["filtered_dataset"].data[util["filtered_index"]] = copypasta;
             loadDataset(dataset);
             reloadList(dataset, util, ui);
             toggleHighlight(ui);
@@ -213,7 +233,14 @@ function setEventListeners(dataset, util, ui) {
                 }
             });
         }
-        reloadList(new Dataset(filteredData), util, ui);
+        util["filtered_dataset"] = new Dataset(filteredData);
+        reloadList(dataset, util, ui);
+    });
+
+    ui["button_tag_clear"].addEventListener("click", () => {
+        ui["tag_filter_input"].value = "";
+        util["filtered_dataset"] = dataset;
+        reloadList(dataset, util, ui);
     });
 
     ui["highlight_tag_input"].addEventListener("keyup", key => {
@@ -286,16 +313,12 @@ function setEventListeners(dataset, util, ui) {
         dropdown.classList.toggle("spm-settings-in");
     });
 
-    ui["button_tag_clear"].addEventListener("click", () => {
-        ui["tag_filter_input"].value = "";
-        reloadList(dataset, util, ui);
-    })
 }
 
 async function main() {
 
     const dataset     = await loadDataset();
-    const util        = getUtilData();
+    const util        = getUtilData(dataset);
     const ui          = getInterfaceElements();
 
     reloadList(dataset, util, ui);
