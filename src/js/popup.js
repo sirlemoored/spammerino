@@ -189,6 +189,7 @@ function setEventListeners(dataset, util, ui) {
             util["filtered_index"] = 0;
             updateHighlight(dataset, util, ui);
             toggleHighlight(ui);
+            ui["highlight_text"].focus();
             
             ui["tag_filter_input"].value = "";
             util["filtered_dataset"] = dataset;
@@ -208,7 +209,7 @@ function setEventListeners(dataset, util, ui) {
 
     ui["highlight_save"].addEventListener("click", () => {
         let copypasta = new Copypasta("", [], "");
-        copypasta.text = ui["highlight_text"].value.replaceAll("\n","");
+        copypasta.text = ui["highlight_text"].value.replaceAll("\n"," ").trim();
         copypasta.tags = util["temporary_tags"];
         setCopypastaAt(util["index"], copypasta, dataset).then((_) => {
             util["filtered_dataset"].data[util["filtered_index"]] = copypasta;
@@ -246,7 +247,7 @@ function setEventListeners(dataset, util, ui) {
     ui["highlight_tag_input"].addEventListener("keyup", key => {
         switch(key.key){
             case ",":
-                let v = ui["highlight_tag_input"].value.replaceAll(/[,\n]/g,"").toLowerCase().substring(0,25);
+                let v = ui["highlight_tag_input"].value.replaceAll(/[,\n]/g,"").toLowerCase().substring(0,25).trim();
                 ui["highlight_tag_input"].value = "";
                 if (v != "")
                     addTag(v, util, ui);
@@ -265,7 +266,7 @@ function setEventListeners(dataset, util, ui) {
     });
 
     ui["highlight_tag_input"].addEventListener("focusout", () => {
-        let v = ui["highlight_tag_input"].value.replaceAll(/[,\n]/g,"").toLowerCase().substring(0, 25);
+        let v = ui["highlight_tag_input"].value.replaceAll(/[,\n]/g,"").toLowerCase().substring(0, 25).trim();
         ui["highlight_tag_input"].value = "";
         if (v != "")
             addTag(v, util, ui);
@@ -283,6 +284,7 @@ function setEventListeners(dataset, util, ui) {
                     let obj = JSON.parse(text);
                     setData(DATA_KEY, obj).then(async _ => {
                     dataset = await loadDataset();
+                    util["filtered_dataset"] = dataset;
                     reloadList(dataset, util, ui);
                 });
                 } catch (e) {
